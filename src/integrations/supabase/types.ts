@@ -14,7 +14,174 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      collaborations: {
+        Row: {
+          brand: string
+          collaboration_type: string | null
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          id: string
+          is_published: boolean | null
+          logo: string | null
+          testimonial: string | null
+          testimonial_author: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          brand: string
+          collaboration_type?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_published?: boolean | null
+          logo?: string | null
+          testimonial?: string | null
+          testimonial_author?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          brand?: string
+          collaboration_type?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_published?: boolean | null
+          logo?: string | null
+          testimonial?: string | null
+          testimonial_author?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      contact_submissions: {
+        Row: {
+          company: string | null
+          created_at: string | null
+          email: string
+          id: string
+          is_read: boolean | null
+          message: string
+          name: string
+          subject: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string | null
+          email: string
+          id?: string
+          is_read?: boolean | null
+          message: string
+          name: string
+          subject: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          name?: string
+          subject?: string
+        }
+        Relationships: []
+      }
+      portfolio_items: {
+        Row: {
+          approach: string | null
+          brand: string | null
+          category: string
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          id: string
+          image_url: string
+          is_featured: boolean | null
+          is_published: boolean | null
+          objective: string | null
+          results: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          approach?: string | null
+          brand?: string | null
+          category: string
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          image_url: string
+          is_featured?: boolean | null
+          is_published?: boolean | null
+          objective?: string | null
+          results?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          approach?: string | null
+          brand?: string | null
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          image_url?: string
+          is_featured?: boolean | null
+          is_published?: boolean | null
+          objective?: string | null
+          results?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      videos: {
+        Row: {
+          category: string
+          created_at: string | null
+          display_order: number | null
+          duration: string | null
+          embed_url: string
+          id: string
+          is_published: boolean | null
+          thumbnail_url: string
+          title: string
+          updated_at: string | null
+          views: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          display_order?: number | null
+          duration?: string | null
+          embed_url: string
+          id?: string
+          is_published?: boolean | null
+          thumbnail_url: string
+          title: string
+          updated_at?: string | null
+          views?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          display_order?: number | null
+          duration?: string | null
+          embed_url?: string
+          id?: string
+          is_published?: boolean | null
+          thumbnail_url?: string
+          title?: string
+          updated_at?: string | null
+          views?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
