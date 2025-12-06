@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ExternalLink } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
+// Fallback images
 import portfolio1 from "@/assets/portfolio-1.jpg";
 import portfolio2 from "@/assets/portfolio-2.jpg";
 import portfolio3 from "@/assets/portfolio-3.jpg";
@@ -9,77 +12,62 @@ import portfolio4 from "@/assets/portfolio-4.jpg";
 import portfolio5 from "@/assets/portfolio-5.jpg";
 import portfolio6 from "@/assets/portfolio-6.jpg";
 
-const categories = ["All", "Beauty", "Skincare", "Lifestyle", "Product Demo"];
+interface PortfolioItem {
+  id: string;
+  title: string;
+  category: string;
+  image_url: string;
+  description: string | null;
+  brand: string | null;
+  objective: string | null;
+  approach: string | null;
+  results: string | null;
+  is_featured: boolean;
+}
 
-const portfolioItems = [
-  {
-    id: 1,
-    title: "Glow Serum Campaign",
-    category: "Skincare",
-    image: portfolio1,
-    description: "A comprehensive product launch campaign featuring the brand's new vitamin C serum line.",
-    brand: "Glow Beauty Co.",
-    objective: "Drive awareness and sales for new serum launch",
-    approach: "Created a series of educational content pieces showcasing serum benefits, application techniques, and before/after results.",
-    results: "2.5M+ views, 15% conversion rate",
-  },
-  {
-    id: 2,
-    title: "Morning Routine Series",
-    category: "Lifestyle",
-    image: portfolio2,
-    description: "Authentic morning routine content featuring multiple lifestyle and beauty products.",
-    brand: "Various Partners",
-    objective: "Showcase products in real-life context",
-    approach: "Filmed genuine morning routines with natural integration of products, focusing on relatable storytelling.",
-  },
-  {
-    id: 3,
-    title: "Luxury Lip Collection",
-    category: "Beauty",
-    image: portfolio3,
-    description: "High-end makeup collection showcase with focus on texture and color payoff.",
-    brand: "Luxe Cosmetics",
-    objective: "Position brand as premium choice for lip products",
-    approach: "Created ASMR-style application videos with close-up product shots highlighting quality and pigmentation.",
-    results: "1.8M reach, featured on brand's main page",
-  },
-  {
-    id: 4,
-    title: "Clean Beauty Edit",
-    category: "Skincare",
-    image: portfolio4,
-    description: "Curated content series for a clean beauty brand focusing on ingredient transparency.",
-    brand: "Pure Skin Lab",
-    objective: "Educate audience on clean beauty benefits",
-    approach: "Educational content breaking down ingredients and their benefits, paired with application tutorials.",
-  },
-  {
-    id: 5,
-    title: "Texture & Touch",
-    category: "Product Demo",
-    image: portfolio5,
-    description: "Sensory-focused product demonstration content highlighting product textures.",
-    brand: "SkinFirst",
-    objective: "Showcase unique product textures to drive curiosity",
-    approach: "Created satisfying texture shots and application content with ASMR elements.",
-    results: "Viral on TikTok with 5M+ views",
-  },
-  {
-    id: 6,
-    title: "Fragrance Story",
-    category: "Lifestyle",
-    image: portfolio6,
-    description: "Lifestyle content series for a luxury fragrance brand.",
-    brand: "Essence Perfumery",
-    objective: "Create emotional connection with fragrance",
-    approach: "Storytelling approach linking scents to moments and memories, creating aspirational lifestyle content.",
-  },
+const fallbackWork = [
+  { id: "1", title: "Glow Serum Campaign", category: "Skincare", image_url: portfolio1 },
+  { id: "2", title: "Morning Routine", category: "Lifestyle", image_url: portfolio2 },
+  { id: "3", title: "Luxury Lip Collection", category: "Beauty", image_url: portfolio3 },
+  { id: "4", title: "Clean Beauty Edit", category: "Skincare", image_url: portfolio4 },
+  { id: "5", title: "Texture & Touch", category: "Product Demo", image_url: portfolio5 },
+  { id: "6", title: "Fragrance Story", category: "Lifestyle", image_url: portfolio6 },
 ];
+
+const categories = ["All", "Beauty", "Skincare", "Lifestyle", "Product Demo"];
 
 const Portfolio = () => {
   const [activeCategory, setActiveCategory] = useState("All");
-  const [selectedItem, setSelectedItem] = useState<typeof portfolioItems[0] | null>(null);
+  const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchPortfolio();
+  }, []);
+
+  const fetchPortfolio = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("portfolio_items" as any)
+        .select("*")
+        .eq("is_published", true)
+        .order("display_order", { ascending: true });
+
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        setPortfolioItems(data as unknown as PortfolioItem[]);
+      } else {
+        setPortfolioItems(fallbackWork as PortfolioItem[]);
+      }
+    } catch (error) {
+      console.error("Error fetching portfolio:", error);
+      setPortfolioItems(fallbackWork as PortfolioItem[]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredItems = activeCategory === "All"
     ? portfolioItems
@@ -127,34 +115,40 @@ const Portfolio = () => {
       {/* Portfolio Grid */}
       <section className="section-padding bg-background">
         <div className="container-wide">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredItems.map((item) => (
-              <div
-                key={item.id}
-                id={String(item.id)}
-                className="group cursor-pointer"
-                onClick={() => setSelectedItem(item)}
-              >
-                <div className="relative overflow-hidden rounded-lg hover-lift">
-                  <div className="aspect-[4/5] overflow-hidden">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <p className="text-sm text-rose-light uppercase tracking-wider mb-1">
-                      {item.category}
-                    </p>
-                    <h3 className="font-serif text-xl text-cream">{item.title}</h3>
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-pulse text-muted-foreground">Loading portfolio...</div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredItems.map((item) => (
+                <div
+                  key={item.id}
+                  id={String(item.id)}
+                  className="group cursor-pointer"
+                  onClick={() => setSelectedItem(item)}
+                >
+                  <div className="relative overflow-hidden rounded-lg hover-lift">
+                    <div className="aspect-[4/5] overflow-hidden">
+                      <img
+                        src={item.image_url}
+                        alt={item.title}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                      <p className="text-sm text-rose-light uppercase tracking-wider mb-1">
+                        {item.category}
+                      </p>
+                      <h3 className="font-serif text-xl text-cream">{item.title}</h3>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -171,7 +165,7 @@ const Portfolio = () => {
             <div className="grid md:grid-cols-2">
               <div className="aspect-square md:aspect-auto">
                 <img
-                  src={selectedItem.image}
+                  src={selectedItem.image_url}
                   alt={selectedItem.title}
                   className="w-full h-full object-cover"
                 />
@@ -184,22 +178,28 @@ const Portfolio = () => {
                   {selectedItem.title}
                 </h2>
                 <p className="text-muted-foreground mb-6">
-                  {selectedItem.description}
+                  {selectedItem.description || "Beautiful content crafted with care."}
                 </p>
 
                 <div className="space-y-4 mb-8">
-                  <div>
-                    <h4 className="font-semibold text-sm uppercase tracking-wider mb-1">Brand</h4>
-                    <p className="text-muted-foreground">{selectedItem.brand}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-sm uppercase tracking-wider mb-1">Objective</h4>
-                    <p className="text-muted-foreground">{selectedItem.objective}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-sm uppercase tracking-wider mb-1">Approach</h4>
-                    <p className="text-muted-foreground">{selectedItem.approach}</p>
-                  </div>
+                  {selectedItem.brand && (
+                    <div>
+                      <h4 className="font-semibold text-sm uppercase tracking-wider mb-1">Brand</h4>
+                      <p className="text-muted-foreground">{selectedItem.brand}</p>
+                    </div>
+                  )}
+                  {selectedItem.objective && (
+                    <div>
+                      <h4 className="font-semibold text-sm uppercase tracking-wider mb-1">Objective</h4>
+                      <p className="text-muted-foreground">{selectedItem.objective}</p>
+                    </div>
+                  )}
+                  {selectedItem.approach && (
+                    <div>
+                      <h4 className="font-semibold text-sm uppercase tracking-wider mb-1">Approach</h4>
+                      <p className="text-muted-foreground">{selectedItem.approach}</p>
+                    </div>
+                  )}
                   {selectedItem.results && (
                     <div>
                       <h4 className="font-semibold text-sm uppercase tracking-wider mb-1">Results</h4>
