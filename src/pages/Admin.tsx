@@ -86,6 +86,33 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [editingItem, setEditingItem] = useState<any>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+
+  // Check if user has admin role
+  useEffect(() => {
+    const checkAdminRole = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        return;
+      }
+
+      const { data, error } = await supabase.rpc('has_role', {
+        _user_id: user.id,
+        _role: 'admin'
+      });
+
+      if (error) {
+        console.error('Error checking admin role:', error);
+        setIsAdmin(false);
+      } else {
+        setIsAdmin(data === true);
+      }
+    };
+
+    if (!authLoading) {
+      checkAdminRole();
+    }
+  }, [user, authLoading]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -94,10 +121,21 @@ const Admin = () => {
   }, [user, authLoading, navigate]);
 
   useEffect(() => {
-    if (user) {
+    if (!authLoading && isAdmin === false && user) {
+      toast({
+        title: "Access Denied",
+        description: "You don't have admin privileges to access this page.",
+        variant: "destructive",
+      });
+      navigate("/");
+    }
+  }, [isAdmin, authLoading, user, navigate, toast]);
+
+  useEffect(() => {
+    if (user && isAdmin) {
       fetchData();
     }
-  }, [user, activeTab]);
+  }, [user, activeTab, isAdmin]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -202,7 +240,7 @@ const Admin = () => {
     fetchData();
   };
 
-  if (authLoading) {
+  if (authLoading || isAdmin === null) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-pulse">Loading...</div>
@@ -210,7 +248,7 @@ const Admin = () => {
     );
   }
 
-  if (!user) return null;
+  if (!user || !isAdmin) return null;
 
   const tabs = [
     { id: "portfolio" as TabType, label: "Portfolio", icon: Image },
