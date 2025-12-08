@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Download, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import creatorPortrait from "@/assets/creator-portrait.jpg";
+import creatorPortrait from "@/assets/creator-portrait-new.png";
 
 const skills = [
   { name: "UGC Content Creation", level: 95 },
