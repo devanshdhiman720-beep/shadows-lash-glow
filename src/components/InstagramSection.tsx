@@ -1,50 +1,39 @@
+import { useEffect } from "react";
 import { Instagram, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const INSTAGRAM_HANDLE = "shadowsandlashes";
 const INSTAGRAM_URL = "https://www.instagram.com/shadowsandlashes/";
 
-// Instagram posts to display - add your post URLs here
-const instagramPosts = [
-  {
-    id: "1",
-    embedUrl: "https://www.instagram.com/p/EXAMPLE1/",
-    thumbnail: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&h=400&fit=crop",
-    alt: "Beauty content"
-  },
-  {
-    id: "2", 
-    embedUrl: "https://www.instagram.com/p/EXAMPLE2/",
-    thumbnail: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&h=400&fit=crop",
-    alt: "Skincare routine"
-  },
-  {
-    id: "3",
-    embedUrl: "https://www.instagram.com/p/EXAMPLE3/",
-    thumbnail: "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400&h=400&fit=crop",
-    alt: "Product showcase"
-  },
-  {
-    id: "4",
-    embedUrl: "https://www.instagram.com/p/EXAMPLE4/",
-    thumbnail: "https://images.unsplash.com/photo-1583241475880-083f84372725?w=400&h=400&fit=crop",
-    alt: "Lifestyle content"
-  },
-  {
-    id: "5",
-    embedUrl: "https://www.instagram.com/p/EXAMPLE5/",
-    thumbnail: "https://images.unsplash.com/photo-1560750588-73207b1ef5b8?w=400&h=400&fit=crop",
-    alt: "Beauty tips"
-  },
-  {
-    id: "6",
-    embedUrl: "https://www.instagram.com/p/EXAMPLE6/",
-    thumbnail: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=400&h=400&fit=crop",
-    alt: "Creative content"
-  }
+// Add your Instagram post URLs here
+const instagramPostUrls = [
+  "https://www.instagram.com/p/DKjGvgOSIWU/",
 ];
 
 export const InstagramSection = () => {
+  useEffect(() => {
+    // Load Instagram embed script
+    const script = document.createElement("script");
+    script.src = "//www.instagram.com/embed.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    // Process embeds when script loads
+    script.onload = () => {
+      if ((window as any).instgrm) {
+        (window as any).instgrm.Embeds.process();
+      }
+    };
+
+    return () => {
+      // Cleanup script on unmount
+      const existingScript = document.querySelector('script[src="//www.instagram.com/embed.js"]');
+      if (existingScript) {
+        existingScript.remove();
+      }
+    };
+  }, []);
+
   return (
     <section className="section-padding bg-secondary/30">
       <div className="container-wide">
@@ -62,31 +51,53 @@ export const InstagramSection = () => {
           </p>
         </div>
 
-        {/* Instagram Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4 mb-10">
-          {instagramPosts.map((post, index) => (
-            <a
-              key={post.id}
-              href={INSTAGRAM_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`group relative aspect-square overflow-hidden rounded-lg hover-lift animate-in-delay-${Math.min(index + 1, 4)}`}
+        {/* Instagram Embeds Grid */}
+        <div className="flex flex-wrap justify-center gap-6 mb-10">
+          {instagramPostUrls.map((url, index) => (
+            <div 
+              key={index} 
+              className="w-full max-w-[540px] animate-in"
+              style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <img
-                src={post.thumbnail}
-                alt={post.alt}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                loading="lazy"
-              />
-              {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Instagram className="w-8 h-8 text-white drop-shadow-lg" />
+              <blockquote
+                className="instagram-media"
+                data-instgrm-captioned
+                data-instgrm-permalink={url}
+                data-instgrm-version="14"
+                style={{
+                  background: "hsl(var(--card))",
+                  border: 0,
+                  borderRadius: "12px",
+                  boxShadow: "var(--shadow-md)",
+                  margin: "0 auto",
+                  maxWidth: "540px",
+                  minWidth: "326px",
+                  padding: 0,
+                  width: "100%",
+                }}
+              >
+                <div style={{ padding: "16px" }}>
+                  <a
+                    href={url}
+                    style={{
+                      background: "hsl(var(--card))",
+                      lineHeight: 0,
+                      padding: 0,
+                      textAlign: "center",
+                      textDecoration: "none",
+                      width: "100%",
+                    }}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <div className="flex items-center justify-center py-8">
+                      <Instagram className="w-12 h-12 text-muted-foreground animate-pulse" />
+                    </div>
+                    <div className="text-primary font-medium">View this post on Instagram</div>
+                  </a>
                 </div>
-              </div>
-              {/* Decorative border on hover */}
-              <div className="absolute inset-0 border-2 border-transparent group-hover:border-rose/50 rounded-lg transition-colors duration-300" />
-            </a>
+              </blockquote>
+            </div>
           ))}
         </div>
 
