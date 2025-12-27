@@ -266,3 +266,16 @@
     transform: scale(0.94);
   }
 }
+
+/* CTA Button Styles */
+.bubble-menu-items .pill-link.pill-cta {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.bubble-menu-items .pill-link.pill-cta:hover {
+  background: hsl(var(--primary) / 0.9);
+  transform: scale(1.08);
+}
