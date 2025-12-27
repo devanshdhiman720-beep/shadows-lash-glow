@@ -13,6 +13,7 @@ interface MenuItem {
     bgColor?: string;
     textColor?: string;
   };
+  isCta?: boolean;
 }
 
 interface BubbleMenuProps {
@@ -72,6 +73,14 @@ const DEFAULT_ITEMS: MenuItem[] = [
     ariaLabel: 'Contact',
     rotation: -8,
     hoverStyles: { bgColor: 'hsl(var(--accent))', textColor: 'hsl(var(--accent-foreground))' }
+  },
+  {
+    label: '✨ Work With Me',
+    href: '/contact',
+    ariaLabel: 'Work With Me',
+    rotation: 0,
+    hoverStyles: { bgColor: 'hsl(var(--primary))', textColor: 'hsl(var(--primary-foreground))' },
+    isCta: true
   }
 ];
 
@@ -231,11 +240,11 @@ export default function BubbleMenu({
                   role="menuitem"
                   to={item.href}
                   aria-label={item.ariaLabel || item.label}
-                  className="pill-link"
+                  className={`pill-link ${item.isCta ? 'pill-cta' : ''}`}
                   style={{
                     '--item-rot': `${item.rotation ?? 0}deg`,
-                    '--pill-bg': menuBg,
-                    '--pill-color': menuContentColor,
+                    '--pill-bg': item.isCta ? 'hsl(var(--primary))' : menuBg,
+                    '--pill-color': item.isCta ? 'hsl(var(--primary-foreground))' : menuContentColor,
                     '--hover-bg': item.hoverStyles?.bgColor || 'hsl(var(--accent))',
                     '--hover-color': item.hoverStyles?.textColor || menuContentColor
                   } as React.CSSProperties}
