@@ -1,8 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
+import { Instagram, Youtube, Mail } from 'lucide-react';
 
 import './BubbleMenu.css';
+
+const SOCIAL_LINKS = [
+  { icon: Instagram, href: 'https://instagram.com/shadowsandlashes', label: 'Instagram' },
+  { icon: Youtube, href: 'https://youtube.com/@shadowsandlashes', label: 'YouTube' },
+  { icon: Mail, href: 'mailto:hello@shadowsandlashes.com', label: 'Email' }
+];
 
 interface MenuItem {
   label: string;
@@ -264,6 +271,22 @@ export default function BubbleMenu({
               </li>
             ))}
           </ul>
+          
+          {/* Social Media Icons */}
+          <div className="social-icons-container">
+            {SOCIAL_LINKS.map((social) => (
+              <a
+                key={social.label}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={social.label}
+                className="social-icon-bubble"
+              >
+                <social.icon size={24} />
+              </a>
+            ))}
+          </div>
         </div>
       )}
     </>
